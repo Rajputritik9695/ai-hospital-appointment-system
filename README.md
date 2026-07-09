@@ -370,15 +370,13 @@ https://your-n8n-instance.app.n8n.cloud
 
 LinkedIn
 
-```
-https://linkedin.com/in/YOUR-LINKEDIN
-```
+https://www.linkedin.com/in/ritik-singh-rajput-49b964319/
 
 GitHub
 
-```
+
 https://github.com/Rajputritik9695
-```
+
 
 ---
 
