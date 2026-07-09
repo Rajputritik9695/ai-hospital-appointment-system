@@ -61,7 +61,7 @@ const Home = () => {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-primary to-secondary opacity-30 blur-2xl rounded-full" />
               <img 
-                src="https://images.unsplash.com/photo-1551076805-e18690c5e53b?q=80&w=800&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop" 
                 alt="Hospital Staff" 
                 className="relative rounded-3xl shadow-2xl object-cover h-[500px] w-full border border-white/20 dark:border-slate-800"
               />
