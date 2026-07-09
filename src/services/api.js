@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Replace this with your actual n8n webhook URL
-const API_URL = "https://rajputritik.app.n8n.cloud/webhook-test/cad84b94-78c9-40f5-b043-8d324a32eb1b";
+const API_URL = "https://rajputritik.app.n8n.cloud/webhook/7e3dd8f1-4918-4416-817e-c9cabb9db020";
 
 const api = axios.create({
   baseURL: API_URL,
