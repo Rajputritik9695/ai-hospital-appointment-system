@@ -5,99 +5,25 @@ import toast from 'react-hot-toast';
 import { Calendar, Clock, User, Phone, Mail, FileText } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
-import { getDoctors, getDepartments, submitAppointment } from '../services/api';
+import { submitAppointment } from '../services/api';
 
 export default function BookAppointment() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const [departments, setDepartments] = useState([]);
-  const [allDoctors, setAllDoctors] = useState([]);
-  const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [selectedDoctorData, setSelectedDoctorData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      department: searchParams.get('department') || '',
-      doctorId: searchParams.get('doctor') ? parseInt(searchParams.get('doctor')) : '',
       date: '',
       time: ''
     }
   });
 
-  const selectedDept = watch('department');
-  const selectedDocId = watch('doctorId');
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [docsRes, deptsRes] = await Promise.all([
-          getDoctors(),
-          getDepartments()
-        ]);
-        setAllDoctors(docsRes.data);
-        setDepartments(deptsRes.data);
-        
-        // Handle initial URL params
-        const initialDocId = searchParams.get('doctor');
-        if (initialDocId) {
-          const doc = docsRes.data.find(d => d.id === parseInt(initialDocId));
-          if (doc) {
-            setValue('department', doc.Department);
-            setSelectedDoctorData(doc);
-          }
-        }
-      } catch (error) {
-        toast.error("Failed to load doctors data.");
-      } finally {
-        setIsPageLoading(false);
-      }
-    };
-    fetchInitialData();
-  }, [searchParams, setValue]);
-
-  // Update doctors list when department changes
-  useEffect(() => {
-    if (selectedDept) {
-      const docsInDept = allDoctors.filter(doc => doc.Department === selectedDept);
-      setFilteredDoctors(docsInDept);
-      
-      // Reset selected doctor if they are not in the new department
-      if (selectedDocId) {
-        const docStillValid = docsInDept.find(d => d.id === parseInt(selectedDocId));
-        if (!docStillValid) {
-          setValue('doctorId', '');
-          setSelectedDoctorData(null);
-        }
-      }
-    } else {
-      setFilteredDoctors([]);
-      setValue('doctorId', '');
-      setSelectedDoctorData(null);
-    }
-  }, [selectedDept, allDoctors, selectedDocId, setValue]);
-
-  // Update selected doctor details
-  useEffect(() => {
-    if (selectedDocId) {
-      const doc = allDoctors.find(d => d.id === parseInt(selectedDocId));
-      setSelectedDoctorData(doc || null);
-    } else {
-      setSelectedDoctorData(null);
-    }
-  }, [selectedDocId, allDoctors]);
-
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const payload = {
-        ...data,
-        doctorDetails: selectedDoctorData
-      };
-      
-      await submitAppointment(payload);
+      await submitAppointment(data);
       navigate('/success');
     } catch (error) {
       if (error.message === "Requested appointment is unavailable") {
@@ -112,14 +38,6 @@ export default function BookAppointment() {
 
   // Prevent past dates
   const today = new Date().toISOString().split('T')[0];
-
-  if (isPageLoading) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-darkbg py-12">
@@ -225,53 +143,6 @@ export default function BookAppointment() {
                   <Calendar className="w-5 h-5 text-primary" /> Appointment Details
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Department *</label>
-                    <select 
-                      className={`w-full px-4 py-2.5 rounded-xl border ${errors.department ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-shadow`}
-                      {...register("department", { required: "Department is required" })}
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                    {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department.message}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Doctor *</label>
-                    <select 
-                      className={`w-full px-4 py-2.5 rounded-xl border ${errors.doctorId ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-shadow disabled:opacity-50`}
-                      {...register("doctorId", { required: "Doctor is required" })}
-                      disabled={!selectedDept}
-                    >
-                      <option value="">Select Doctor</option>
-                      {filteredDoctors.map(doc => (
-                        <option key={doc.id} value={doc.id}>{doc.Name}</option>
-                      ))}
-                    </select>
-                    {errors.doctorId && <p className="text-red-500 text-xs mt-1">{errors.doctorId.message}</p>}
-                  </div>
-                </div>
-
-                {/* Doctor Details Preview */}
-                {selectedDoctorData && (
-                  <div className="mb-6 p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 flex flex-col sm:flex-row gap-4 items-center">
-                    <img src={selectedDoctorData.Image} alt={selectedDoctorData.Name} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" />
-                    <div className="flex-grow text-center sm:text-left">
-                      <h4 className="font-bold text-slate-900 dark:text-white">{selectedDoctorData.Name}</h4>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">{selectedDoctorData.Specialization}</p>
-                      <p className="text-xs text-primary font-medium mt-1">Fee: ₹{selectedDoctorData.ConsultationFee}</p>
-                    </div>
-                    <div className="text-sm text-slate-600 dark:text-slate-300 text-center sm:text-right border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-slate-700 pt-3 sm:pt-0 sm:pl-4 mt-3 sm:mt-0">
-                      <p><span className="font-medium text-slate-800 dark:text-slate-200">Days:</span> {selectedDoctorData.AvailableDays.join(', ')}</p>
-                      <p><span className="font-medium text-slate-800 dark:text-slate-200">Timing:</span> {selectedDoctorData.AvailableTime}</p>
-                    </div>
-                  </div>
-                )}
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Preferred Date *</label>
