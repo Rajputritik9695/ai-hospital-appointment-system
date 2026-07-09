@@ -211,57 +211,56 @@ Send Confirmation Email
 - appointment_time
 - symptoms
 
----
+
 
 # 📸 Screenshots
 
 ## 🏠 Home Page
 
-```
-images/home.png
-```
 
----
+images/home.png
+
+
+
 
 ## Appointment Booking
 
-```
-images/booking-form.png
-```
 
----
+images/booking-form.png
+
+
+
 
 ## AI Workflow
 
-```
-images/n8n-workflow.png
-```
 
----
+images/n8n-workflow.png
+
+
+
 
 ## Confirmation Email
 
-```
-images/confirmation-email.png
-```
 
----
+images/confirmation-email.png
+
+
+
 
 ## Slot Unavailable Email
 
-```
-images/slot-unavailable-email.png
-```
 
----
+images/slot-unavailable-email.png
+
+
+
 
 ## PostgreSQL Database
 
-```
-images/database.png
-```
 
----
+images/database.png
+
+
 
 # 🚀 Workflow
 
